@@ -1,0 +1,134 @@
+
+.shirt {
+    max-width: 72ex;
+    margin: auto;
+}
+
+.shirt a {
+    color: #000000;
+}
+.shirt em {
+}
+.shirt strong {
+    font-size: 95%;
+}
+.shirt code {
+    font-size: 120%;
+}
+.shirt .katex {
+    font-size: 95%;
+}
+.shirt p img {
+    max-width: 500px;
+    max-height: 500px;
+}
+
+.shirt > * {
+    padding-left: 1.5em;
+    padding-right: 1.5em;
+}
+.shirt > * > h1 ,
+.shirt > * > h2 ,
+.shirt > * > h3 {
+    font-weight: normal;
+}
+.shirt > * > h1 {
+    margin-bottom: 1ex;
+    font-size: 2em;
+}
+.shirt > * > h2 {
+    margin-top: 3ex;
+    margin-bottom: 1ex;
+    font-size: 1.6em;
+}
+.shirt > * > h3 {
+    margin-top: 3ex;
+    margin-bottom: 1ex;
+    font-size: 1.3em;
+}
+.shirt > * > ul ,
+.shirt > * > ol {
+    padding-left: 1.5em;
+}
+.shirt > * > ol > li ,
+.shirt > * > ul > li {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+.shirt > * > ol ol ,
+.shirt > * > ol ul ,
+.shirt > * > ul ol ,
+.shirt > * > ul ul {
+    padding-left: 1em;
+}
+.shirt > * > p {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.shirt > * > .ts {
+    margin-top: 1ex;
+    text-align: right;
+}
+
+.shirt > .index {
+}
+.shirt > .index > .teaser {
+    font-size: 75%;
+    display: block;
+    margin-top: 2em;
+    margin-bottom: 2em;
+    text-decoration: none;
+}
+.shirt > .index > .teaser > .ts {
+    display: block;
+    margin-top: 2em;
+    padding-top: 1ex;
+    border-top: 1px solid black;
+    text-align: right;
+    clear: both;
+}
+.shirt > .index > .teaser > .more {
+    display: block;
+    font-size: 150%;
+}
+
+.shirt > .index > .teaser > p img {
+    max-width: 250px;
+    float: right;
+    margin-left: 1em;
+}
+.shirt > .index > .teaser > * {
+    margin-top: 1.2em;
+    margin-bottom: 1.2em;
+}
+.shirt > .index > .teaser > h1 ,
+.shirt > .index > .teaser > h2 {
+    font-size: 1.3em;
+}
+.shirt > .index > .teaser > h1 ,
+.shirt > .index > .teaser > h2 ,
+.shirt > .index > .teaser > h3 {
+    margin-top: 1ex;
+    margin-bottom: 1ex;
+}
+.shirt > .index > .teaser > h1 > img {
+    float: left;
+    margin-right: 1em;
+}
+
+.shirt > .toc {
+    margin-top: 2em;
+    margin-bottom: 2em;
+}
+.shirt > .toc a {
+    display: block;
+    text-decoration: none;
+    margin-bottom: 1ex;
+}
+
+#footer {
+    margin-top: 2em;
+    text-align: center;
+    clear: both;
+}

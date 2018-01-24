@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html><head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+  <link type="text/css" rel="stylesheet" href="katex/katex.css">
+  <link type="text/css" rel="stylesheet" href="css/shirt.css">
+  <link type="text/css" rel="stylesheet" href="css/blog.css">
+  <link type="text/css" rel="stylesheet" href="css/site.css">
+
+  <script type="text/javascript" charset="utf-8" src="katex/katex.js"></script>
+  <script type="text/javascript" charset="utf-8" src="js/marked.js"></script>
+  <script type="text/javascript" charset="utf-8" src="js/shirt.js"></script>
+
+  <title>I have a blog shirt</title>
+
+</head><body>
+  <div id="blog" class="blog shirt">
+    <div class="post"></div>
+    <div class="tagcloud"></div>
+    <div class="index"></div>
+  </div>
+  <div id="footer">
+    <hr/>
+    :: powered by <a href="shirt/docs/index.html">shirt</a> ::
+    math rendering by <a href="https://github.com/khan/katex/">kaTeX</a>,
+    markdown by <a href="https://github.com/chjj/marked/">marked</a> ::
+    <a class="sitemap" href="sitemap.html">sitemap for crawlers</a> ::
+  </div>
+  <script type="text/javascript">
+
+function index_click(p) {
+    shirt.load_post(p);
+}
+function tagcloud_click(t) {
+    shirt.load_post(p);
+}
+
+var shirt = new Shirt("blog");
+shirt.load_index();
+
+  </script>
+</body></html>

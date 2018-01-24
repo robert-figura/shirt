@@ -1,0 +1,6 @@
+.hg/
+htdocs.index
+htdocs/
+md/
+contrib/katex/
+**~

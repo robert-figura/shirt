@@ -1,0 +1,271 @@
+#!/bin/sh
+
+teaser_crop="500"
+
+htdocs="htdocs"
+index="$htdocs.index"
+cp="cp -rL"
+
+usage () {
+  echo "USAGE: $0 [--site htdocs] [--index htdocs.index] init|publish|archive"
+  echo
+  echo "FLAGS:"
+  awk '/^ *[^ ]*\) # / { sub(/^ */,"  "); sub(/\) #/, " ^"); print }' "$0" | column -e -t -s^
+  echo
+  echo "SUBCOMANDS:"
+  awk '/^do_.* \(\) \{ # / { sub(/^do_/,"  "); sub(/ \(\) \{ #/, " ^"); print }' "$0" | column -e -t -s^
+  echo
+  exit 1
+}
+error () {
+  echo "$0: error($?): $@"
+  exit 1
+}
+
+init () {
+  mkdir -p "$htdocs/md" ||
+    error "could not create directory '$htdocs/md'"
+  cd "$htdocs"
+  $cp "../src/shirt"/* .
+
+  for skin in "$@" ; do
+    $cp "../src/$skin"/* .
+  done
+  ln -s "$skin.html" "index.html"
+
+  touch "../$index"
+  rm -f "index.json"
+  ln -s "../$index" "index.json"
+
+  if test -d "site/" ; then
+    $cp "../site"/* .
+  fi
+}
+
+find_post () {
+  post="$1"
+  draft="md/$post.md"
+  if test -r "$post" ; then # publish a file
+    draft="$post"
+    post="`basename "$post" .md`"
+  fi
+  test -r "$draft" ||
+    error "post not found: $post"
+}
+
+copy_post () {
+  find_post "$1" # set $post and $draft
+  upload="`dirname "$draft"`/$post"
+  md="$htdocs/md/$post.md"
+  files="$htdocs/md/$post"
+  # copy post
+  $cp "$draft" "$md" ||
+    error "could not copy '$draft' to '$md'" 
+  # copy files
+  if test -d "$upload" ; then
+    rm -rf "$files"
+    $cp "$upload" "$files" ||
+      error "could not copy '$upload' to '$files'" 
+  fi
+}
+
+summary () {
+  # todo: set TZ to utc:
+  awk -v teaser_crop="$teaser_crop" -v ts="`LC_ALL=C date +%s`" '
+    function Q(s) {
+      gsub(/\\/, "\\\\", s);
+      gsub(/"/, "\\\"", s);
+      gsub(/\n/, "\\n", s);
+      return s
+    }
+    function trim(s) {
+      sub(/^ */, "", s)
+      sub(/ *$/, "", s)
+      return s
+    }
+    !json["file"] {
+      json["file"] = FILENAME
+    }
+    !body && match($0, /^([^ ]+): *(.*)$/) {
+      m1 = $0
+      sub(/:.*/, "", m1)
+      m2 = $0
+      sub(/[^ ]*: */, "", m2)
+      json[m1] = m2
+      next
+    }
+    !body {
+      body = 1
+    }
+    !json["teaser"] && /[^ ]/ {
+      t = t trim($0) "\n"
+    }
+    length(t) > teaser_crop {
+      json["teaser"] = substr(t, 1, teaser_crop);
+    }
+    END {
+      if(!json["teaser"] && t)
+        json["teaser"] = substr(t, 1, teaser_crop);
+      printf(  "%s",   "{")
+      for(i in json)
+        printf("%s",   "\"" i "\":\"" Q(json[i]) "\",")
+      printf(  "%s",   "\"ts\":\"" ts "\"")
+      printf(  "%s\n", "}")
+    }
+  ' "$1"
+}
+# for crawlers
+sitemap_entry () {
+  cat <<EOF
+<!DOCTYPE html>
+<html><head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+</head><body>
+<div>please turn on javascipt!</div>
+<script type="text/javascript">
+  window.location.href = "../index.html#$1";
+</script>
+<pre>
+EOF
+  cat "md/$1.md"
+  cat <<EOF
+</pre>
+</body></html>
+EOF
+}
+sitemap_index () {
+  cd "$htdocs"
+  cat <<EOF
+<!DOCTYPE html>
+<html><head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+</head><body>
+<div>You're looking at the index for crawlers, please go to the <a href='index.html'>main site</a>!</div>
+EOF
+
+  for f in md/*.md ; do
+    b="`basename "$f" .md`"
+    echo "<a href='sitemap/$b.html'>$f</a><br/>"
+  done
+
+  cat <<EOF
+</body></html>
+EOF
+}
+sitemap () {
+  rm -rf "$htdocs/sitemap" "$htdocs/sitemap.html"
+  mkdir -p "$htdocs/sitemap"
+  for f in md/*.md ; do
+    b="`basename "$f" .md`"
+    sitemap_entry "$b" > "$htdocs/sitemap/$b.html"
+  done
+  sitemap_index > "$htdocs/sitemap.html"
+}
+publish () {
+  test -d "$htdocs" ||
+    error "site directory '$htdocs' not found, try $0 init"
+  for i in "$@" ; do
+    copy_post "$i"
+    # update index
+    summary "$draft" >> "$index" ||
+      error "failed to update index file"
+  done
+  # regenerate sitemap
+  sitemap
+}
+rebuild () {
+  test -d "$htdocs" || 
+    error "site directory '$htdocs' not found, try $0 init"
+  test -r "$index" ||
+    error "index '$index' not found"
+  awk '
+    (m1 = $0) &&
+    sub(/^.*"file":"/, "", m1) &&
+    sub(/".*$/, "", m1) {
+        print m1
+    }
+  ' "$index" |
+  while read p ; do
+    echo "copying $p"
+    copy_post "$p"
+  done
+}
+
+compress () {
+  awk '
+    {
+      (m1=$0) &&
+      sub(/^.*"file":"/, "", m1) &&
+      sub(/".*$/, "", m1) {
+      last[m1] = $0
+    }
+    !first[m1] {
+      ++first[m1]
+      print $0
+    }
+    END {
+      for(i in last)
+        print last[i]
+    }
+  ' "$index" > "$index.new"
+}
+archive () {
+  tar chzf "$htdocs.tar.gz" "$htdocs"
+}
+
+fun=""
+while test -n "$1" ; do
+  case "$1" in
+    init) # <skin>... # create site directory to put on your server
+      # todo: reconstruct directory using an index file
+      fun="init"
+      ;;
+    skin) # <skin> # install additional skins
+      fun="skin"
+      ;;
+    publish) # <post> # copy post from md to htdocs/md
+      fun="publish"
+      ;;
+    compress) # # shorten index: for each post, remove all but the first and last entries
+      fun="compress"
+      ;;
+    archive) # # generate .tar.gz archive
+      fun="archive"
+      ;;
+    summary)
+      fun="summary"
+      ;;
+    sitemap) # # generate html copy of site for crawlers
+      fun="sitemap"
+      ;;
+    rebuild) # # rebuild site/md directory from index.json
+      fun="rebuild"
+      ;;
+    --site) # <htdocs> # site directory to generate
+      site="$2"
+      shift
+      ;;
+    --index) # <htdocs.index> # where to keep the index file
+      index="$2"
+      shift
+      ;;
+    --link) # # broken
+      cp="cp -rs"
+      ;;
+    --copy)
+      cp="cp -rL"
+      ;;
+    *)
+      if test -z "$fun" ; then
+	echo "argument not recognized: $1"
+	usage
+      fi
+      break
+      ;;
+  esac
+  shift
+done
+if test -z "$fun" ; then
+  usage
+fi
+"$fun" "$@"

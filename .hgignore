@@ -1,0 +1,6 @@
+
+^\.git/
+^htdocs\.index$
+^htdocs/
+^md/
+^contrib/katex/

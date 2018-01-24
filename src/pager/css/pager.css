@@ -1,0 +1,60 @@
+
+* {
+    margin: 0px;
+    padding: 0px;
+}
+
+.pager.shirt {
+    font-size: 24px;
+    max-width: 80ex;
+}
+
+.pager.shirt > .post > h2 {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.pager.shirt .pageno:before {
+    content: "p";
+}
+.pager.shirt .pageno {
+    position: fixed;
+    bottom: 0px;
+    right: 0px;
+    padding: 0.5ex;
+    font-size: 20px;
+}
+
+.pager.shirt > .post > * {
+    display: none;
+}
+.pager.shirt > .post > h1.fixed {
+    display: block;
+    max-width: 100%;
+}
+.pager.shirt > .post.clear > * ,
+.pager.shirt > .post > .clear ,
+.pager.shirt > .post > .clear ~ * {
+    display: block;
+}
+.pager.shirt > .post > .stop ~ * {
+    display: none;
+}
+
+.pager.shirt > .post > .stop + h2 {
+    display: inline-block;
+    font-size: 16px;
+    width: 66%;
+    margin: auto;
+    margin-top: 2em;
+}
+.pager.shirt > .post > .stop + h2:before {
+    content: ">> ";
+}
+
+.pager.shirt > .post > h1 {
+    margin-top: 0px;
+    margin-bottom: 2em;
+    width: 100%;
+    max-width: 100%;
+}

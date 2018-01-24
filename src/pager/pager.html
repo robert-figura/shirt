@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html><head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+  <link type="text/css" rel="stylesheet" href="katex/katex.css">
+  <link type="text/css" rel="stylesheet" href="css/shirt.css">
+  <link type="text/css" rel="stylesheet" href="css/pager.css">
+  <link type="text/css" rel="stylesheet" href="css/site.css">
+
+  <script type="text/javascript" charset="utf-8" src="katex/katex.js"></script>
+  <script type="text/javascript" charset="utf-8" src="js/marked.js"></script>
+  <script type="text/javascript" charset="utf-8" src="js/shirt.js"></script>
+
+  <title>I have a pager shirt</title>
+
+</head><body>
+  <div id="pager" class="pager shirt">
+    <div class="pageno">?</div>
+    <div class="post"></div>
+  </div>
+  <script type="text/javascript">
+
+var shirt = new Shirt("pager");
+shirt.load_index();
+window.addEventListener("keydown", shirt.pager.keydown.bind(shirt.pager));
+
+  </script>
+</body></html>
